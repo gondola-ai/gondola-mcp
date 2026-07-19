@@ -213,6 +213,17 @@ one-time OAuth sign-in; booking tools **📕** place or manage real reservations
 - **Real bookings**, not just search — hotels and cars book straight through.
 - **No API key.** Anonymous search out of the box; OAuth only when you reach for your own data.
 
+## Self-hosting
+
+**You don't need to self-host.** Gondola is a hosted service — connect your client directly to
+`https://mcp.gondola.ai/mcp` using any method above.
+
+The `Dockerfile` in this repo is **not** the Gondola server. It's a thin stdio **proxy** (via
+[`mcp-remote`](https://www.npmjs.com/package/mcp-remote)) that bridges to the hosted endpoint, so MCP
+registries that introspect stdio servers can index Gondola's tools from this repository. It simply
+forwards to `https://mcp.gondola.ai/mcp` — running it yourself gains you nothing over connecting to
+the hosted server directly. It exists for registry indexing only.
+
 ## Links
 
 - Docs & tool reference: https://gondola.ai/mcp
