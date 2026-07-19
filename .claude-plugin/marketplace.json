@@ -1,0 +1,17 @@
+{
+  "name": "gondola",
+  "owner": {
+    "name": "Gondola AI",
+    "email": "team@gondola.ai"
+  },
+  "metadata": {
+    "description": "Gondola travel MCP — cash-vs-award search for hotels, flights, and rental cars across every major loyalty program."
+  },
+  "plugins": [
+    {
+      "name": "gondola",
+      "source": ".",
+      "description": "Cash-vs-award travel search: hotels, flights, and rental cars across every major loyalty program, with cents-per-point valuations, loyalty tracking, rate alerts, and direct booking."
+    }
+  ]
+}

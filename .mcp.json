@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gondola": {
+      "type": "http",
+      "url": "https://mcp.gondola.ai/mcp"
+    }
+  }
+}
