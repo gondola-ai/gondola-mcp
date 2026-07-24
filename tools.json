@@ -1,0 +1,1654 @@
+[
+  {
+    "name": "search_hotels",
+    "description": "Search for hotels by location and dates with cash AND points pricing.\n\n    Returns hotels with side-by-side cash vs points rates, cents-per-point (CPP) valuation,\n    and deal scores so you can recommend the best value. This is Gondola's unique advantage \u2014\n    no other travel search shows both cash and points rates together.\n\n    Args:\n        location: City name, address, or area to search (e.g. \"Tokyo\", \"Manhattan, New York\", \"near LAX airport\").\n        checkin: Check-in date in YYYY-MM-DD format (e.g. \"2026-04-15\").\n        checkout: Check-out date in YYYY-MM-DD format (e.g. \"2026-04-20\").\n        num_adults: Number of adult guests. Defaults to 2.\n        chain_name: Optional hotel chain to filter by (e.g. \"marriott\", \"hilton\", \"hyatt\", \"ihg\").\n            Case-insensitive substring match against each result's chain. If nothing matches, the\n            unfiltered results are returned with an explicit note so you don't keep retrying.\n        loyalty_programs: Optional list of the user's loyalty programs (e.g. [\"hilton_honors\", \"marriott_bonvoy\"]).\n            When provided, results include personalized earnings and tier benefits like 5th night free.\n        loyalty_points: Optional dict of program name to points balance (e.g. {\"hilton_honors\": 250000}).\n            When provided, results indicate whether the user can afford each hotel with points.\n        limit: Max number of hotels to return (default 20). The response notes how many more exist\n            and how to narrow; raise this only when the user explicitly wants a longer list.\n\n    Returns:\n        Formatted list of hotels with cash rates, points rates, CPP valuation, and deal recommendations.\n    ",
+    "inputSchema": {
+      "properties": {
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        },
+        "chain_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chain Name"
+        },
+        "loyalty_programs": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Loyalty Programs"
+        },
+        "loyalty_points": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Loyalty Points"
+        },
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "location",
+        "checkin",
+        "checkout"
+      ],
+      "title": "search_hotelsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "search_hotelsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Search hotels",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_hotel_details",
+    "description": "Get detailed information, room types, and rates for a specific hotel.\n\n    Use this after search_hotels to get full details for a hotel the user is interested in.\n    Returns room options with pricing, cancellation policies, and amenities.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (returned by search_hotels).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n\n    Returns:\n        Detailed hotel information including rooms, rates, policies, and amenities.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "checkin",
+        "checkout"
+      ],
+      "title": "get_hotel_detailsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_hotel_detailsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get hotel details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "compare_rates",
+    "description": "Compare cash vs points rates across multiple hotels side-by-side.\n\n    Use this after search_hotels to help a user decide between their top hotel picks.\n    Returns a comparison table with cash rate, points rate, CPP valuation, and value signals\n    for each hotel, highlighting the best cash value and best points value.\n\n    Args:\n        hotel_ids: List of hotel IDs to compare (max 5). Get these from search_hotels results.\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n\n    Returns:\n        Side-by-side comparison of cash vs points rates with recommendations.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Hotel Ids",
+          "type": "array"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hotel_ids",
+        "checkin",
+        "checkout"
+      ],
+      "title": "compare_ratesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "compare_ratesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Compare hotel rates",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_booking_link",
+    "description": "Get booking options for a hotel.\n\n    Presents two explicit booking paths so the path is settled up front rather\n    than discovered mid-conversation:\n\n    1. **Check out on Gondola** with a booking link \u2014 always available.\n    2. **Book here now** with an eligible saved card \u2014 shown only when the user\n       has a card that can be charged in chat, and referenced by its last 4.\n\n    Anonymous users get path 1 plus a prompt to sign up for in-chat booking.\n\n    Use this after search_hotels or get_hotel_details when a user wants to book.\n    Pass ``gondola_rate_id`` whenever a specific rate has been surfaced (from\n    get_hotel_details or compare_rates) so the link lands on that rate's\n    checkout page instead of the generic hotel page.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search_hotels results).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n        children_ages: Comma-separated ages of children (e.g. \"5,8\"). Empty string if no children.\n        gondola_rate_id: Optional rate ID from get_hotel_details/compare_rates. When provided,\n            the link deep-links straight to that rate's checkout page.\n\n    Returns:\n        Booking instructions tailored to the user's auth status.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        },
+        "children_ages": {
+          "default": "",
+          "title": "Children Ages",
+          "type": "string"
+        },
+        "gondola_rate_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gondola Rate Id"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "checkin",
+        "checkout"
+      ],
+      "title": "get_booking_linkArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_booking_linkOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get a booking link",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "book_hotel",
+    "description": "Book a hotel room using a rate from get_hotel_details.\n\n    Requires a Gondola account (API key) and a saved payment method.\n    Use get_payment_methods to find your payment ID.\n\n    The gondola_rate_id comes from the room rates returned by get_hotel_details \u2014\n    each room option has a rate ID you can use here.\n\n    Guest details (given_name, family_name, email_address, phone_number) can either be\n    passed directly or prefilled from a saved travel profile: pass travel_profile_id\n    (from get_travel_profiles) to book \"as <traveler>\" without collecting each field.\n    Any field you also pass explicitly overrides the profile.\n\n    To earn points and elite credit, pass loyalty_account_id \u2014 use the Member Number from\n    get_loyalty_accounts that matches the hotel's chain (e.g. the World of Hyatt account\n    for a Hyatt property). When a loyalty_account_id is passed, the booking goes out under\n    the email registered to that membership (overriding any travel profile or email_address),\n    so the stay credits to the right account.\n\n    Args:\n        gondola_rate_id: The rate ID from get_hotel_details room rates.\n        payment_id: Payment method ID from get_payment_methods.\n        given_name: Guest's first name (optional if travel_profile_id is provided).\n        family_name: Guest's last name (optional if travel_profile_id is provided).\n        email_address: Guest's email for confirmation (optional if travel_profile_id is provided).\n        phone_number: Guest's phone number with country code (optional if travel_profile_id is provided).\n        special_request: Optional special request for the hotel (e.g. \"high floor\", \"late check-in\").\n        loyalty_account_id: Optional Member Number (from get_loyalty_accounts) to earn points.\n        travel_profile_id: Optional travel profile ID (from get_travel_profiles) to prefill guest details.\n\n    Returns:\n        Booking confirmation with ID and details, or an error message.\n    ",
+    "inputSchema": {
+      "properties": {
+        "gondola_rate_id": {
+          "title": "Gondola Rate Id",
+          "type": "integer"
+        },
+        "payment_id": {
+          "title": "Payment Id",
+          "type": "string"
+        },
+        "given_name": {
+          "default": "",
+          "title": "Given Name",
+          "type": "string"
+        },
+        "family_name": {
+          "default": "",
+          "title": "Family Name",
+          "type": "string"
+        },
+        "email_address": {
+          "default": "",
+          "title": "Email Address",
+          "type": "string"
+        },
+        "phone_number": {
+          "default": "",
+          "title": "Phone Number",
+          "type": "string"
+        },
+        "special_request": {
+          "default": "",
+          "title": "Special Request",
+          "type": "string"
+        },
+        "loyalty_account_id": {
+          "default": "",
+          "title": "Loyalty Account Id",
+          "type": "string"
+        },
+        "travel_profile_id": {
+          "default": "",
+          "title": "Travel Profile Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gondola_rate_id",
+        "payment_id"
+      ],
+      "title": "book_hotelArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "book_hotelOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Book a hotel",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_payment_methods",
+    "description": "List the user's saved payment methods for booking.\n\n    Requires a Gondola account (API key). Returns saved credit/debit cards with their brand, last 4\n    digits, expiration, payment ID (needed for the book_hotel tool), and whether each card can be\n    booked in chat.\n\n    Returns:\n        List of saved payment methods with IDs, or instructions to add one.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_payment_methodsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_payment_methodsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get payment methods",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_rate_alerts",
+    "description": "Get all active rate alerts for the current user.\n\n    Returns the user's rate alerts showing which hotels they're monitoring for price drops.\n    Requires a Gondola account with an API key.\n\n    Returns:\n        List of active rate alerts with hotel names, dates, and current rates.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_rate_alertsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_rate_alertsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get rate alerts",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "create_rate_alert",
+    "description": "Create a rate alert to monitor a hotel for price drops.\n\n    Set up an alert to be notified by email when the rate drops for a specific hotel.\n    Optionally specify dates, or leave them out to monitor any stay.\n    Requires a Gondola account with an API key.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n        checkin: Check-in date in YYYY-MM-DD format. Must be provided with checkout, or both omitted.\n        checkout: Check-out date in YYYY-MM-DD format. Must be provided with checkin, or both omitted.\n\n    Returns:\n        Confirmation that the rate alert was created, with notification details.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkin"
+        },
+        "checkout": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkout"
+        }
+      },
+      "required": [
+        "hotel_id"
+      ],
+      "title": "create_rate_alertArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "create_rate_alertOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Create a rate alert",
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "delete_rate_alert",
+    "description": "Delete a rate alert so you stop monitoring a hotel for price drops.\n\n    Requires a Gondola account with an API key.\n\n    Args:\n        alert_id: The rate alert ID to delete (from get_rate_alerts).\n\n    Returns:\n        Confirmation that the rate alert was deleted.\n    ",
+    "inputSchema": {
+      "properties": {
+        "alert_id": {
+          "title": "Alert Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alert_id"
+      ],
+      "title": "delete_rate_alertArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "delete_rate_alertOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Delete a rate alert",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_upcoming_trips",
+    "description": "Get the user's upcoming trips including hotel stays, flights, and car rentals.\n\n    Returns a summary of all upcoming travel reservations with dates, confirmation numbers,\n    costs, loyalty earnings, and savings opportunities.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of upcoming trips, or instructions to connect an account.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_upcoming_tripsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_upcoming_tripsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get upcoming trips",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_past_trips",
+    "description": "Get the user's past trips including hotel stays and flights.\n\n    Returns a summary of past travel reservations with dates, confirmation numbers,\n    costs, and loyalty earnings.\n\n    Requires a Gondola account (API key).\n\n    Args:\n        limit: Max number of past trips to return, most recent first (default 20). The response\n            notes how many more exist; raise this only when the user wants their full history.\n\n    Returns:\n        Formatted list of past trips, or instructions to connect an account.\n    ",
+    "inputSchema": {
+      "properties": {
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "title": "get_past_tripsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_past_tripsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get past trips",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_loyalty_accounts",
+    "description": "Get the user's hotel and airline loyalty accounts with points balances and values.\n\n    Returns all linked loyalty accounts including current points balance, tier status,\n    estimated cash value, recent points changes, and expiration dates.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of loyalty accounts with balances and values, or instructions to connect.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_loyalty_accountsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_loyalty_accountsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get loyalty accounts",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_free_night_credits",
+    "description": "Get the user's free night certificates (award nights) across loyalty programs.\n\n    Returns each certificate's program, how many remain, what it covers, when it\n    expires, and whether a points top-up is allowed.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of free night certificates, or instructions to connect.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_free_night_creditsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_free_night_creditsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get free night certificates",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "predict_price",
+    "description": "Predict whether now is a good time to book a hotel, or if the user should wait for a better price.\n\n    Uses historical price data and trends to assess whether the current price is a good deal.\n    Call this when a user asks \"Should I book now or wait?\" or wants to know if a price is good.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        nightly_cash_cost: The current nightly cash rate for the hotel.\n        nightly_cash_cost_currency: Currency of the cash rate (e.g. \"USD\", \"EUR\").\n        nightly_points_cost: Optional current nightly points cost for the hotel.\n\n    Returns:\n        Price prediction with recommendation (book now vs wait), confidence level, and key signals.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "nightly_cash_cost": {
+          "title": "Nightly Cash Cost",
+          "type": "number"
+        },
+        "nightly_cash_cost_currency": {
+          "title": "Nightly Cash Cost Currency",
+          "type": "string"
+        },
+        "nightly_points_cost": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nightly Points Cost"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "checkin",
+        "checkout",
+        "nightly_cash_cost",
+        "nightly_cash_cost_currency"
+      ],
+      "title": "predict_priceArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "predict_priceOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Predict price drops",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_hotel_stats",
+    "description": "Get pricing analytics and percentile data for a hotel rate.\n\n    Use this to help users understand if a rate is a good deal. Shows how the cash rate\n    and points redemption value compare historically across the chain.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n        nightly_cash_cost: The current nightly cash rate.\n        nightly_cash_cost_currency: Currency of the cash rate (e.g. \"USD\", \"EUR\").\n        nightly_points_cost: Optional current nightly points cost.\n\n    Returns:\n        Pricing stats with percentile rankings and value assessment.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "nightly_cash_cost": {
+          "title": "Nightly Cash Cost",
+          "type": "number"
+        },
+        "nightly_cash_cost_currency": {
+          "title": "Nightly Cash Cost Currency",
+          "type": "string"
+        },
+        "nightly_points_cost": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nightly Points Cost"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "nightly_cash_cost",
+        "nightly_cash_cost_currency"
+      ],
+      "title": "get_hotel_statsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_hotel_statsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get hotel stats",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_multi_night_rates",
+    "description": "Get a rate calendar showing prices across a date range for a hotel.\n\n    Use this when a user has flexible dates and wants to find the cheapest time to stay.\n    Shows cash rates, points rates, and value percentiles for each available check-in date.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n        start_date: Start of date range in YYYY-MM-DD format.\n        end_date: End of date range in YYYY-MM-DD format.\n        nights: Number of nights per stay (default: 1).\n\n    Returns:\n        Rate calendar with pricing for each available date.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "start_date": {
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "nights": {
+          "default": 1,
+          "title": "Nights",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "start_date",
+        "end_date"
+      ],
+      "title": "get_multi_night_ratesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_multi_night_ratesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get multi-night rates",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_similar_hotels",
+    "description": "Find hotels similar to one the user is looking at.\n\n    Use this when a user wants alternatives, comparisons, or asks \"show me hotels like this one.\"\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests (default: 2).\n\n    Returns:\n        List of similar hotels with rates and ratings.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "checkin",
+        "checkout"
+      ],
+      "title": "get_similar_hotelsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_similar_hotelsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get similar hotels",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "optimize_loyalty_portfolio",
+    "description": "Analyze the user's whole loyalty portfolio and surface the highest-value actions.\n\n    Trip-independent. Looks across every loyalty program the user holds \u2014 plus the transferable\n    card currencies (Amex, Chase, Bilt, etc.) that can feed hotel programs \u2014 and reports points\n    expiring soon (ranked by value at risk), the best transfer opportunities, and the largest\n    balances. When the user's travel profile is available, it also tailors the view to their home\n    airport, the airlines they fly, their frequent destinations, and when they travel (e.g.\n    flagging points that expire before their usual travel months). Takes no arguments.\n\n    Use this when the user asks how to make the most of their points, what's expiring, or where\n    they can transfer. For deciding where to book a specific trip, use search_hotels /\n    compare_rates instead.\n\n    Returns:\n        A Markdown portfolio summary, or instructions to connect accounts when none are linked.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "optimize_loyalty_portfolioArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "optimize_loyalty_portfolioOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Optimize loyalty portfolio",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "search_flights",
+    "description": "Search for flights by route and date and return cash-priced options.\n\n    Results are ranked for the traveler by the search backend \u2014 weighing their airline\n    loyalty/status and travel history alongside flight quality \u2014 and returned 10 per page.\n    To see more options, call again with ``page=2``, ``page=3``, and so on.\n\n    Args:\n        origin: Origin airport code or city (e.g. \"LAX\", \"SFO\", \"New York\").\n        destination: Destination airport code or city (e.g. \"NRT\", \"LHR\", \"Paris\").\n        departure_date: Departure date in YYYY-MM-DD format (e.g. \"2025-03-15\").\n        return_date: Optional return date in YYYY-MM-DD format for a round trip. In browse\n            mode, round trips are searched as two one-way legs.\n        num_passengers: Number of passengers. Defaults to 1.\n        cabin_class: Optional cabin class preference. One of:\n            \"economy\", \"premium economy\", \"business\", \"first\".\n        mode: Leave as \"browse\" (default). \"book\" is a restricted alpha \u2014 only use it if\n            the user explicitly asks to book a flight.\n        page: 1-based results page, 10 options per page. Increment to see more options.\n        airlines: Optional airline codes or names for browse mode (e.g. [\"UA\"] or\n            [\"United\"]). Passed to the Google Flights search API.\n        max_stops: Optional maximum stops per direction in browse mode. Use 0 for\n            nonstop only, 1 for nonstop or one-stop itineraries.\n\n    Returns:\n        A ranked, paged list of flight options \u2014 airlines, routes, prices, and a link.\n    ",
+    "inputSchema": {
+      "properties": {
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "destination": {
+          "title": "Destination",
+          "type": "string"
+        },
+        "departure_date": {
+          "title": "Departure Date",
+          "type": "string"
+        },
+        "return_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Return Date"
+        },
+        "num_passengers": {
+          "default": 1,
+          "title": "Num Passengers",
+          "type": "integer"
+        },
+        "cabin_class": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cabin Class"
+        },
+        "mode": {
+          "default": "browse",
+          "enum": [
+            "browse",
+            "book"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "page": {
+          "default": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "airlines": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Airlines"
+        },
+        "max_stops": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Stops"
+        }
+      },
+      "required": [
+        "origin",
+        "destination",
+        "departure_date"
+      ],
+      "title": "search_flightsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "search_flightsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Search flights",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "search_vehicles",
+    "description": "Search for rental vehicles at an airport or city.\n\n    Args:\n        pickup_location: Airport IATA code (e.g. \"LAX\", \"JFK\", \"SFO\").\n        pickup_datetime: Pickup date and time in ISO format (e.g. \"2025-03-15T10:00:00\").\n        dropoff_datetime: Drop-off date and time in ISO format (e.g. \"2025-03-20T10:00:00\").\n        vehicle_class: Optional preference: Economy, Compact, Standard, FullSize, Premium, Luxury, SUV, Van.\n\n    Returns:\n        List of available rental vehicles with rates and details.\n    ",
+    "inputSchema": {
+      "properties": {
+        "pickup_location": {
+          "title": "Pickup Location",
+          "type": "string"
+        },
+        "pickup_datetime": {
+          "title": "Pickup Datetime",
+          "type": "string"
+        },
+        "dropoff_datetime": {
+          "title": "Dropoff Datetime",
+          "type": "string"
+        },
+        "vehicle_class": {
+          "anyOf": [
+            {
+              "enum": [
+                "Economy",
+                "Compact",
+                "Standard",
+                "FullSize",
+                "Premium",
+                "Luxury",
+                "SUV",
+                "Van"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vehicle Class"
+        }
+      },
+      "required": [
+        "pickup_location",
+        "pickup_datetime",
+        "dropoff_datetime"
+      ],
+      "title": "search_vehiclesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "search_vehiclesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Search rental cars",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_vehicle_details",
+    "description": "Get detailed information about a specific rental vehicle option.\n\n    Use this after search_vehicles to get extras, insurance options, charges, and cancellation policy.\n\n    Args:\n        vendor_code: Vendor code from search results (e.g. \"ZE\" for Hertz, \"AL\" for Alamo).\n        rate_code: Rate code from search results.\n        search_id: Search ID from the vehicle search results.\n\n    Returns:\n        Vehicle details including extras, charges, and policies.\n    ",
+    "inputSchema": {
+      "properties": {
+        "vendor_code": {
+          "title": "Vendor Code",
+          "type": "string"
+        },
+        "rate_code": {
+          "title": "Rate Code",
+          "type": "string"
+        },
+        "search_id": {
+          "title": "Search Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "vendor_code",
+        "rate_code",
+        "search_id"
+      ],
+      "title": "get_vehicle_detailsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_vehicle_detailsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get rental car details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "book_vehicle",
+    "description": "Book a rental vehicle from a search result.\n\n    Requires a Gondola account (API key) and a saved payment method.\n    Use get_payment_methods to find your payment ID.\n\n    Args:\n        search_id: Search ID from search_vehicles.\n        vendor_code: Vendor code from search results (e.g. \"ZE\" for Hertz).\n        rate_code: Rate code of the selected vehicle from search results.\n        acriss_code: ACRISS vehicle classification code from search results.\n        given_name: Renter's first name.\n        family_name: Renter's last name.\n        email_address: Renter's email for confirmation.\n        phone_number: Renter's phone number with country code (e.g. \"+1-555-123-4567\").\n        payment_id: Payment method ID from get_payment_methods.\n        pickup_location: Optional pickup IATA code for the selected vehicle (disambiguates metro fanouts).\n        loyalty_account_id: Optional loyalty account ID to earn points on this rental.\n\n    Returns:\n        Booking confirmation with ID and details, or an error message.\n    ",
+    "inputSchema": {
+      "properties": {
+        "search_id": {
+          "title": "Search Id",
+          "type": "string"
+        },
+        "vendor_code": {
+          "title": "Vendor Code",
+          "type": "string"
+        },
+        "rate_code": {
+          "title": "Rate Code",
+          "type": "string"
+        },
+        "acriss_code": {
+          "title": "Acriss Code",
+          "type": "string"
+        },
+        "given_name": {
+          "title": "Given Name",
+          "type": "string"
+        },
+        "family_name": {
+          "title": "Family Name",
+          "type": "string"
+        },
+        "email_address": {
+          "title": "Email Address",
+          "type": "string"
+        },
+        "phone_number": {
+          "title": "Phone Number",
+          "type": "string"
+        },
+        "payment_id": {
+          "title": "Payment Id",
+          "type": "string"
+        },
+        "pickup_location": {
+          "default": "",
+          "title": "Pickup Location",
+          "type": "string"
+        },
+        "loyalty_account_id": {
+          "default": "",
+          "title": "Loyalty Account Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "search_id",
+        "vendor_code",
+        "rate_code",
+        "acriss_code",
+        "given_name",
+        "family_name",
+        "email_address",
+        "phone_number",
+        "payment_id"
+      ],
+      "title": "book_vehicleArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "book_vehicleOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Book a rental car",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "cancel_vehicle_booking",
+    "description": "Cancel an existing vehicle booking.\n\n    Args:\n        booking_id: The Gondola booking ID (confirmation number) of the vehicle booking.\n\n    Returns:\n        Cancellation result.\n    ",
+    "inputSchema": {
+      "properties": {
+        "booking_id": {
+          "title": "Booking Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "booking_id"
+      ],
+      "title": "cancel_vehicle_bookingArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "cancel_vehicle_bookingOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Cancel a rental car booking",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_vehicle_booking",
+    "description": "Get details for a specific vehicle booking.\n\n    Args:\n        booking_id: The Gondola booking ID (confirmation number).\n\n    Returns:\n        Vehicle booking details including vendor, pickup/dropoff, vehicle, rate, and status.\n    ",
+    "inputSchema": {
+      "properties": {
+        "booking_id": {
+          "title": "Booking Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "booking_id"
+      ],
+      "title": "get_vehicle_bookingArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_vehicle_bookingOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get a rental car booking",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_vehicle_booking_link",
+    "description": "Get a Gondola.ai deep link for a specific vehicle from search results.\n\n    Authenticated users get instructions to book in-conversation with book_vehicle plus the\n    web link as a fallback; anonymous users get the web link directly.\n\n    Args:\n        search_id: Search ID from search_vehicles.\n        vendor_code: Vendor code from search results.\n        rate_code: Rate code of the selected vehicle.\n        pickup_datetime: Pickup date and time in ISO format.\n        dropoff_datetime: Drop-off date and time in ISO format.\n\n    Returns:\n        Booking instructions tailored to the user's auth status.\n    ",
+    "inputSchema": {
+      "properties": {
+        "search_id": {
+          "title": "Search Id",
+          "type": "string"
+        },
+        "vendor_code": {
+          "title": "Vendor Code",
+          "type": "string"
+        },
+        "rate_code": {
+          "title": "Rate Code",
+          "type": "string"
+        },
+        "pickup_datetime": {
+          "title": "Pickup Datetime",
+          "type": "string"
+        },
+        "dropoff_datetime": {
+          "title": "Dropoff Datetime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "search_id",
+        "vendor_code",
+        "rate_code",
+        "pickup_datetime",
+        "dropoff_datetime"
+      ],
+      "title": "get_vehicle_booking_linkArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_vehicle_booking_linkOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get a rental car booking link",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "credit_card_coverage",
+    "description": "Look up rental car CDW/LDW coverage provided by a credit card.\n\n    Provide EITHER credit_card_product_name OR card_number_bin + card_provider.\n\n    Args:\n        credit_card_product_name: Exact card product name (preferred when known).\n        card_number_bin: First 6-8 digits of the card number (BIN).\n        card_provider: Card network (\"visa\", \"mastercard\", \"amex\", or \"discover\"). Required with card_number_bin.\n\n    Returns:\n        Coverage type, max days, and a human-readable summary.\n    ",
+    "inputSchema": {
+      "properties": {
+        "credit_card_product_name": {
+          "default": "",
+          "title": "Credit Card Product Name",
+          "type": "string"
+        },
+        "card_number_bin": {
+          "default": "",
+          "title": "Card Number Bin",
+          "type": "string"
+        },
+        "card_provider": {
+          "default": "",
+          "title": "Card Provider",
+          "type": "string"
+        }
+      },
+      "title": "credit_card_coverageArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "credit_card_coverageOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Check credit card rental coverage",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_vehicle_booking_coverage",
+    "description": "Get the rental car CDW/LDW coverage stored at booking time for a vehicle booking.\n\n    Args:\n        booking_id: The Gondola booking ID of the vehicle booking.\n\n    Returns:\n        Coverage details stored on the booking, or an error message.\n    ",
+    "inputSchema": {
+      "properties": {
+        "booking_id": {
+          "title": "Booking Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "booking_id"
+      ],
+      "title": "get_vehicle_booking_coverageArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_vehicle_booking_coverageOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get rental car booking coverage",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_hotel_reviews",
+    "description": "Get guest reviews for a specific hotel.\n\n    Use this to help users understand what other guests thought about a hotel.\n    Returns up to 10 recent reviews with ratings and comments.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search results).\n\n    Returns:\n        Formatted list of guest reviews with author names, ratings, and review text.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hotel_id"
+      ],
+      "title": "get_hotel_reviewsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_hotel_reviewsOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get hotel reviews",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_suggested_searches",
+    "description": "Get personalized travel suggestions and trip inspiration.\n\n    Returns curated hotel recommendations based on the user's preferences, recent searches,\n    popular destinations, and upcoming holidays. Great for when the user doesn't know where to go.\n\n    Returns:\n        Travel suggestions with preview hotel results.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_suggested_searchesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_suggested_searchesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get suggested searches",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_booking",
+    "description": "Get details for a specific hotel booking.\n\n    Args:\n        booking_id: The booking ID or confirmation number.\n\n    Returns:\n        Booking details including hotel, dates, room, rate, and status.\n    ",
+    "inputSchema": {
+      "properties": {
+        "booking_id": {
+          "title": "Booking Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "booking_id"
+      ],
+      "title": "get_bookingArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_bookingOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get a booking",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "diagnose_rates",
+    "description": "Diagnose rate availability and source statuses for a specific hotel.\n\n    Use this to investigate why certain rates (e.g. AAA, member, points)\n    are or aren't showing for a property. Shows per-supplier status and\n    a full breakdown of every rate by type.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID.\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n        rate_sources: Optional comma-separated rate sources to check\n            (e.g. \"travelport\", \"direct,travelport\"). If omitted, all sources are checked.\n    ",
+    "inputSchema": {
+      "properties": {
+        "hotel_id": {
+          "title": "Hotel Id",
+          "type": "integer"
+        },
+        "checkin": {
+          "title": "Checkin",
+          "type": "string"
+        },
+        "checkout": {
+          "title": "Checkout",
+          "type": "string"
+        },
+        "num_adults": {
+          "default": 2,
+          "title": "Num Adults",
+          "type": "integer"
+        },
+        "rate_sources": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rate Sources"
+        }
+      },
+      "required": [
+        "hotel_id",
+        "checkin",
+        "checkout"
+      ],
+      "title": "diagnose_ratesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "diagnose_ratesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Diagnose rates",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "get_travel_profiles",
+    "description": "Get the user's saved travel profiles (guest name, email, and phone presets).\n\n    Each profile has a selectable Profile ID. Pass it to book_hotel as `travel_profile_id`\n    to prefill the guest details \u2014 the same \"book as <traveler>\" selection the website\n    checkout offers \u2014 instead of collecting name, email, and phone field by field.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of travel profiles with IDs, or instructions to add one.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_travel_profilesArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_travel_profilesOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get travel profiles",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "get_traveler_context",
+    "description": "Get the user's saved travel context to personalize recommendations.\n\n    Returns the user's loyalty programs and elite tiers, home airport, preferred airlines and\n    cabin, preferred hotel chains, typical trip patterns (business vs leisure, budgets, frequent\n    destinations), and any preferences they've stated or that have been learned from past\n    conversations. Call this once at the start of a travel or planning session and weigh it across\n    hotel, flight, and car recommendations \u2014 it is the single best source of who this traveler is.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted travel context, or instructions to build one.\n    ",
+    "inputSchema": {
+      "properties": {},
+      "title": "get_traveler_contextArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "get_traveler_contextOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Get travel context",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "update_traveler_profile",
+    "description": "Save a learned travel preference or experience to the user's traveler profile.\n\n    Use when the user shares a durable preference, like, dislike, or trip experience that should\n    inform future recommendations \u2014 \"Always takes a window seat\", \"Prefers boutique hotels over\n    chains\", \"Vegetarian\". Don't save temporary logistics like \"my flight lands at 3pm\".\n\n    Saved entries come back from get_traveler_context in later sessions, which is how a preference\n    stated once is still known next time.\n\n    Requires a Gondola account (API key).\n\n    Args:\n        profile_entry: The preference or experience to save. Be specific and actionable.\n            Good: \"Prefers ocean-view rooms\". Bad: \"Liked the hotel\".\n\n    Returns:\n        Confirmation of the saved entry, or an error message.\n    ",
+    "inputSchema": {
+      "properties": {
+        "profile_entry": {
+          "title": "Profile Entry",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile_entry"
+      ],
+      "title": "update_traveler_profileArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "properties": {
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "update_traveler_profileOutput",
+      "type": "object"
+    },
+    "annotations": {
+      "title": "Save a travel preference",
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  }
+]

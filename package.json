@@ -1,0 +1,17 @@
+{
+  "name": "gondola-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Gondola travel MCP — a lightweight local server that advertises the Gondola tool catalog; execution runs on the hosted server at https://mcp.gondola.ai/mcp.",
+  "bin": {
+    "gondola-mcp": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  },
+  "license": "MIT"
+}
