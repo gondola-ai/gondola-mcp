@@ -4,9 +4,16 @@
  *
  * Gondola is a HOSTED MCP server (https://mcp.gondola.ai/mcp). This lightweight
  * stdio server exists so registries and tools that build/introspect a server
- * locally can discover Gondola's full tool catalog. It advertises all 34 tools
- * (definitions pulled verbatim from the hosted server) via `tools/list`; actual
- * execution runs on the hosted server, so `tools/call` returns a pointer there.
+ * locally can discover Gondola's tool catalog. It advertises the 30 self-serve
+ * tools (definitions pulled verbatim from the hosted server) via `tools/list`;
+ * actual execution runs on the hosted server, so `tools/call` returns a pointer
+ * there.
+ *
+ * The four mcp:book tools (book_hotel, book_vehicle, cancel_vehicle_booking,
+ * get_payment_methods) are deliberately absent. The hosted server filters them
+ * out of `tools/list` for every connection without that partner-only scope, and
+ * advertising them here would put the financial surface back in front of exactly
+ * the registry crawlers that filtering exists to satisfy.
  *
  * To USE Gondola, connect your client directly to https://mcp.gondola.ai/mcp
  * (see the README / gondola.ai/mcp). You do not need to run this.

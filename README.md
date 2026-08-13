@@ -15,9 +15,9 @@ any MCP-compatible client.** Learn more at [gondola.ai/mcp](https://gondola.ai/m
 
 - **Endpoint:** `https://mcp.gondola.ai/mcp` (Streamable HTTP)
 - **Auth:** search & discovery work **anonymously — no account, no API key**. Personal tools
-  (loyalty balances, trips, saved profiles) and booking use standard MCP **OAuth 2.1 with Dynamic
+  (loyalty balances, trips, saved profiles) use standard MCP **OAuth 2.1 with Dynamic
   Client Registration** — your client signs you in on first use, no key to copy.
-- **Tools:** 34 across hotels, flights, rental cars, loyalty, and analytics.
+- **Tools:** 30 across hotels, flights, rental cars, loyalty, and analytics.
 
 ---
 
@@ -38,7 +38,7 @@ sign you in via OAuth — takes a few seconds, no API key.
 
 ### Or add the MCP server directly (any client)
 
-Search tools work anonymously; personal/booking tools trigger an OAuth login on first call. No client
+Search tools work anonymously; personal tools trigger an OAuth login on first call. No client
 needs an `mcp-remote` bridge — every client below supports remote Streamable HTTP natively.
 
 **Claude Code**
@@ -146,10 +146,15 @@ traveler profiles, and rate alerts.
 
 ---
 
-## MCP tools (34)
+## MCP tools (30)
 
 Search & discovery tools are anonymous. Tools marked **🔒** use your account and require the
-one-time OAuth sign-in; booking tools **📕** place or manage real reservations.
+one-time OAuth sign-in.
+
+Booking is handled through Gondola's checkout: `get_booking_link` and
+`get_vehicle_booking_link` hand your client a direct link. Tools that charge a saved card from
+a tool call are **not** part of the self-serve surface — see
+[Partner booking tools](#partner-booking-tools) below.
 
 ### Hotels
 | Tool | What it does |
@@ -164,7 +169,6 @@ one-time OAuth sign-in; booking tools **📕** place or manage real reservations
 | `predict_price` | Price prediction for a stay. |
 | `get_suggested_searches` | Suggested searches / inspiration. |
 | `get_booking_link` | Direct booking link. |
-| `book_hotel` 🔒📕 | Book a hotel. |
 
 ### Flights
 | Tool | What it does |
@@ -179,9 +183,7 @@ one-time OAuth sign-in; booking tools **📕** place or manage real reservations
 | `credit_card_coverage` | Check credit-card rental insurance coverage. |
 | `get_vehicle_booking_coverage` | Coverage on a specific booking. |
 | `get_vehicle_booking_link` | Direct booking link. |
-| `book_vehicle` 🔒📕 | Book a rental car. |
 | `get_vehicle_booking` 🔒 | Retrieve a car booking. |
-| `cancel_vehicle_booking` 🔒📕 | Cancel a car booking. |
 
 ### Loyalty & analytics
 | Tool | What it does |
@@ -203,7 +205,22 @@ one-time OAuth sign-in; booking tools **📕** place or manage real reservations
 | `get_travel_profiles` 🔒 | Saved traveler profiles. |
 | `update_traveler_profile` 🔒 | Update a traveler profile. |
 | `get_traveler_context` 🔒 | Your traveler context/preferences. |
-| `get_payment_methods` 🔒 | Saved payment methods. |
+
+### Partner booking tools
+
+Four tools place charges against a saved payment method or enumerate the cards that can be
+charged. They require the `mcp:book` scope, which is granted only to onboarded booking
+partners — a client that registers dynamically has it narrowed away at consent, so these tools
+are neither listed nor callable on a normal connection.
+
+| Tool | What it does |
+|------|--------------|
+| `book_hotel` | Book a hotel room against a saved payment method. |
+| `book_vehicle` | Book a rental car against a saved payment method. |
+| `cancel_vehicle_booking` | Cancel a car booking. |
+| `get_payment_methods` | List saved payment methods available for booking. |
+
+Interested in partner access? Email [support@gondola.ai](mailto:support@gondola.ai).
 
 ---
 
@@ -212,7 +229,8 @@ one-time OAuth sign-in; booking tools **📕** place or manage real reservations
 - **Cash and award, together.** Every search shows the cash price beside the points price with a
   cents-per-point value — the "is this redemption worth it?" question, answered inline.
 - **Every major chain + program**, not a single airline or a single OTA.
-- **Real bookings**, not just search — hotels and cars book straight through.
+- **Straight to checkout.** Hotels and cars hand off a direct booking link, so you finish on
+  Gondola rather than retyping the search somewhere else.
 - **No API key.** Anonymous search out of the box; OAuth only when you reach for your own data.
 
 ## Links
