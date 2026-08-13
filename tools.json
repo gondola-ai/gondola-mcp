@@ -1,7 +1,7 @@
 [
   {
     "name": "search_hotels",
-    "description": "Search for hotels by location and dates with cash AND points pricing.\n\n    Returns hotels with side-by-side cash vs points rates, cents-per-point (CPP) valuation,\n    and deal scores so you can recommend the best value. This is Gondola's unique advantage \u2014\n    no other travel search shows both cash and points rates together.\n\n    Args:\n        location: City name, address, or area to search (e.g. \"Tokyo\", \"Manhattan, New York\", \"near LAX airport\").\n        checkin: Check-in date in YYYY-MM-DD format (e.g. \"2026-04-15\").\n        checkout: Check-out date in YYYY-MM-DD format (e.g. \"2026-04-20\").\n        num_adults: Number of adult guests. Defaults to 2.\n        chain_name: Optional hotel chain to filter by (e.g. \"marriott\", \"hilton\", \"hyatt\", \"ihg\").\n            Case-insensitive substring match against each result's chain. If nothing matches, the\n            unfiltered results are returned with an explicit note so you don't keep retrying.\n        loyalty_programs: Optional list of the user's loyalty programs (e.g. [\"hilton_honors\", \"marriott_bonvoy\"]).\n            When provided, results include personalized earnings and tier benefits like 5th night free.\n        loyalty_points: Optional dict of program name to points balance (e.g. {\"hilton_honors\": 250000}).\n            When provided, results indicate whether the user can afford each hotel with points.\n        limit: Max number of hotels to return (default 20). The response notes how many more exist\n            and how to narrow; raise this only when the user explicitly wants a longer list.\n\n    Returns:\n        Formatted list of hotels with cash rates, points rates, CPP valuation, and deal recommendations.\n    ",
+    "description": "Search for hotels by location and dates with cash AND points pricing.\n\n    Returns hotels with side-by-side cash vs points rates, cents-per-point (CPP) valuation,\n    and deal scores so you can recommend the best value. This is Gondola's unique advantage —\n    no other travel search shows both cash and points rates together.\n\n    Args:\n        location: City name, address, or area to search (e.g. \"Tokyo\", \"Manhattan, New York\", \"near LAX airport\").\n        checkin: Check-in date in YYYY-MM-DD format (e.g. \"2026-04-15\").\n        checkout: Check-out date in YYYY-MM-DD format (e.g. \"2026-04-20\").\n        num_adults: Number of adult guests. Defaults to 2.\n        chain_name: Optional hotel chain to filter by (e.g. \"marriott\", \"hilton\", \"hyatt\", \"ihg\").\n            Case-insensitive substring match against each result's chain. If nothing matches, the\n            unfiltered results are returned with an explicit note so you don't keep retrying.\n        loyalty_programs: Optional list of the user's loyalty programs (e.g. [\"hilton_honors\", \"marriott_bonvoy\"]).\n            When provided, results include personalized earnings and tier benefits like 5th night free.\n        loyalty_points: Optional dict of program name to points balance (e.g. {\"hilton_honors\": 250000}).\n            When provided, results indicate whether the user can afford each hotel with points.\n        limit: Max number of hotels to return (default 20). The response notes how many more exist\n            and how to narrow; raise this only when the user explicitly wants a longer list.\n\n    Returns:\n        Formatted list of hotels with cash rates, points rates, CPP valuation, and deal recommendations.\n    ",
     "inputSchema": {
       "properties": {
         "location": {
@@ -204,7 +204,7 @@
   },
   {
     "name": "get_booking_link",
-    "description": "Get booking options for a hotel.\n\n    Presents two explicit booking paths so the path is settled up front rather\n    than discovered mid-conversation:\n\n    1. **Check out on Gondola** with a booking link \u2014 always available.\n    2. **Book here now** with an eligible saved card \u2014 shown only when the user\n       has a card that can be charged in chat, and referenced by its last 4.\n\n    Anonymous users get path 1 plus a prompt to sign up for in-chat booking.\n\n    Use this after search_hotels or get_hotel_details when a user wants to book.\n    Pass ``gondola_rate_id`` whenever a specific rate has been surfaced (from\n    get_hotel_details or compare_rates) so the link lands on that rate's\n    checkout page instead of the generic hotel page.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search_hotels results).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n        children_ages: Comma-separated ages of children (e.g. \"5,8\"). Empty string if no children.\n        gondola_rate_id: Optional rate ID from get_hotel_details/compare_rates. When provided,\n            the link deep-links straight to that rate's checkout page.\n\n    Returns:\n        Booking instructions tailored to the user's auth status.\n    ",
+    "description": "Get booking options for a hotel.\n\n    Presents two explicit booking paths so the path is settled up front rather\n    than discovered mid-conversation:\n\n    1. **Check out on Gondola** with a booking link — always available.\n    2. **Book here now** with an eligible saved card — shown only when the user\n       has a card that can be charged in chat, and referenced by its last 4.\n\n    Anonymous users get path 1 plus a prompt to sign up for in-chat booking.\n\n    Use this after search_hotels or get_hotel_details when a user wants to book.\n    Pass ``gondola_rate_id`` whenever a specific rate has been surfaced (from\n    get_hotel_details or compare_rates) so the link lands on that rate's\n    checkout page instead of the generic hotel page.\n\n    Args:\n        hotel_id: The hotel's Vervotech property ID (from search_hotels results).\n        checkin: Check-in date in YYYY-MM-DD format.\n        checkout: Check-out date in YYYY-MM-DD format.\n        num_adults: Number of adult guests. Defaults to 2.\n        children_ages: Comma-separated ages of children (e.g. \"5,8\"). Empty string if no children.\n        gondola_rate_id: Optional rate ID from get_hotel_details/compare_rates. When provided,\n            the link deep-links straight to that rate's checkout page.\n\n    Returns:\n        Booking instructions tailored to the user's auth status.\n    ",
     "inputSchema": {
       "properties": {
         "hotel_id": {
@@ -265,110 +265,6 @@
     },
     "annotations": {
       "title": "Get a booking link",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "openWorldHint": false
-    }
-  },
-  {
-    "name": "book_hotel",
-    "description": "Book a hotel room using a rate from get_hotel_details.\n\n    Requires a Gondola account (API key) and a saved payment method.\n    Use get_payment_methods to find your payment ID.\n\n    The gondola_rate_id comes from the room rates returned by get_hotel_details \u2014\n    each room option has a rate ID you can use here.\n\n    Guest details (given_name, family_name, email_address, phone_number) can either be\n    passed directly or prefilled from a saved travel profile: pass travel_profile_id\n    (from get_travel_profiles) to book \"as <traveler>\" without collecting each field.\n    Any field you also pass explicitly overrides the profile.\n\n    To earn points and elite credit, pass loyalty_account_id \u2014 use the Member Number from\n    get_loyalty_accounts that matches the hotel's chain (e.g. the World of Hyatt account\n    for a Hyatt property). When a loyalty_account_id is passed, the booking goes out under\n    the email registered to that membership (overriding any travel profile or email_address),\n    so the stay credits to the right account.\n\n    Args:\n        gondola_rate_id: The rate ID from get_hotel_details room rates.\n        payment_id: Payment method ID from get_payment_methods.\n        given_name: Guest's first name (optional if travel_profile_id is provided).\n        family_name: Guest's last name (optional if travel_profile_id is provided).\n        email_address: Guest's email for confirmation (optional if travel_profile_id is provided).\n        phone_number: Guest's phone number with country code (optional if travel_profile_id is provided).\n        special_request: Optional special request for the hotel (e.g. \"high floor\", \"late check-in\").\n        loyalty_account_id: Optional Member Number (from get_loyalty_accounts) to earn points.\n        travel_profile_id: Optional travel profile ID (from get_travel_profiles) to prefill guest details.\n\n    Returns:\n        Booking confirmation with ID and details, or an error message.\n    ",
-    "inputSchema": {
-      "properties": {
-        "gondola_rate_id": {
-          "title": "Gondola Rate Id",
-          "type": "integer"
-        },
-        "payment_id": {
-          "title": "Payment Id",
-          "type": "string"
-        },
-        "given_name": {
-          "default": "",
-          "title": "Given Name",
-          "type": "string"
-        },
-        "family_name": {
-          "default": "",
-          "title": "Family Name",
-          "type": "string"
-        },
-        "email_address": {
-          "default": "",
-          "title": "Email Address",
-          "type": "string"
-        },
-        "phone_number": {
-          "default": "",
-          "title": "Phone Number",
-          "type": "string"
-        },
-        "special_request": {
-          "default": "",
-          "title": "Special Request",
-          "type": "string"
-        },
-        "loyalty_account_id": {
-          "default": "",
-          "title": "Loyalty Account Id",
-          "type": "string"
-        },
-        "travel_profile_id": {
-          "default": "",
-          "title": "Travel Profile Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "gondola_rate_id",
-        "payment_id"
-      ],
-      "title": "book_hotelArguments",
-      "type": "object"
-    },
-    "outputSchema": {
-      "properties": {
-        "result": {
-          "title": "Result",
-          "type": "string"
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "title": "book_hotelOutput",
-      "type": "object"
-    },
-    "annotations": {
-      "title": "Book a hotel",
-      "readOnlyHint": false,
-      "destructiveHint": true,
-      "openWorldHint": true
-    }
-  },
-  {
-    "name": "get_payment_methods",
-    "description": "List the user's saved payment methods for booking.\n\n    Requires a Gondola account (API key). Returns saved credit/debit cards with their brand, last 4\n    digits, expiration, payment ID (needed for the book_hotel tool), and whether each card can be\n    booked in chat.\n\n    Returns:\n        List of saved payment methods with IDs, or instructions to add one.\n    ",
-    "inputSchema": {
-      "properties": {},
-      "title": "get_payment_methodsArguments",
-      "type": "object"
-    },
-    "outputSchema": {
-      "properties": {
-        "result": {
-          "title": "Result",
-          "type": "string"
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "title": "get_payment_methodsOutput",
-      "type": "object"
-    },
-    "annotations": {
-      "title": "Get payment methods",
       "readOnlyHint": true,
       "destructiveHint": false,
       "openWorldHint": false
@@ -846,7 +742,7 @@
   },
   {
     "name": "optimize_loyalty_portfolio",
-    "description": "Analyze the user's whole loyalty portfolio and surface the highest-value actions.\n\n    Trip-independent. Looks across every loyalty program the user holds \u2014 plus the transferable\n    card currencies (Amex, Chase, Bilt, etc.) that can feed hotel programs \u2014 and reports points\n    expiring soon (ranked by value at risk), the best transfer opportunities, and the largest\n    balances. When the user's travel profile is available, it also tailors the view to their home\n    airport, the airlines they fly, their frequent destinations, and when they travel (e.g.\n    flagging points that expire before their usual travel months). Takes no arguments.\n\n    Use this when the user asks how to make the most of their points, what's expiring, or where\n    they can transfer. For deciding where to book a specific trip, use search_hotels /\n    compare_rates instead.\n\n    Returns:\n        A Markdown portfolio summary, or instructions to connect accounts when none are linked.\n    ",
+    "description": "Analyze the user's whole loyalty portfolio and surface the highest-value actions.\n\n    Trip-independent. Looks across every loyalty program the user holds — plus the transferable\n    card currencies (Amex, Chase, Bilt, etc.) that can feed hotel programs — and reports points\n    expiring soon (ranked by value at risk), the best transfer opportunities, and the largest\n    balances. When the user's travel profile is available, it also tailors the view to their home\n    airport, the airlines they fly, their frequent destinations, and when they travel (e.g.\n    flagging points that expire before their usual travel months). Takes no arguments.\n\n    Use this when the user asks how to make the most of their points, what's expiring, or where\n    they can transfer. For deciding where to book a specific trip, use search_hotels /\n    compare_rates instead.\n\n    Returns:\n        A Markdown portfolio summary, or instructions to connect accounts when none are linked.\n    ",
     "inputSchema": {
       "properties": {},
       "title": "optimize_loyalty_portfolioArguments",
@@ -874,7 +770,7 @@
   },
   {
     "name": "search_flights",
-    "description": "Search for flights by route and date and return cash-priced options.\n\n    Results are ranked for the traveler by the search backend \u2014 weighing their airline\n    loyalty/status and travel history alongside flight quality \u2014 and returned 10 per page.\n    To see more options, call again with ``page=2``, ``page=3``, and so on.\n\n    Args:\n        origin: Origin airport code or city (e.g. \"LAX\", \"SFO\", \"New York\").\n        destination: Destination airport code or city (e.g. \"NRT\", \"LHR\", \"Paris\").\n        departure_date: Departure date in YYYY-MM-DD format (e.g. \"2025-03-15\").\n        return_date: Optional return date in YYYY-MM-DD format for a round trip. In browse\n            mode, round trips are searched as two one-way legs.\n        num_passengers: Number of passengers. Defaults to 1.\n        cabin_class: Optional cabin class preference. One of:\n            \"economy\", \"premium economy\", \"business\", \"first\".\n        mode: Leave as \"browse\" (default). \"book\" is a restricted alpha \u2014 only use it if\n            the user explicitly asks to book a flight.\n        page: 1-based results page, 10 options per page. Increment to see more options.\n        airlines: Optional airline codes or names for browse mode (e.g. [\"UA\"] or\n            [\"United\"]). Passed to the Google Flights search API.\n        max_stops: Optional maximum stops per direction in browse mode. Use 0 for\n            nonstop only, 1 for nonstop or one-stop itineraries.\n\n    Returns:\n        A ranked, paged list of flight options \u2014 airlines, routes, prices, and a link.\n    ",
+    "description": "Search for flights by route and date and return cash-priced options.\n\n    Results are ranked for the traveler by the search backend — weighing their airline\n    loyalty/status and travel history alongside flight quality — and returned 10 per page.\n    To see more options, call again with ``page=2``, ``page=3``, and so on.\n\n    Args:\n        origin: Origin airport code or city (e.g. \"LAX\", \"SFO\", \"New York\").\n        destination: Destination airport code or city (e.g. \"NRT\", \"LHR\", \"Paris\").\n        departure_date: Departure date in YYYY-MM-DD format (e.g. \"2025-03-15\").\n        return_date: Optional return date in YYYY-MM-DD format for a round trip. In browse\n            mode, round trips are searched as two one-way legs.\n        num_passengers: Number of passengers. Defaults to 1.\n        cabin_class: Optional cabin class preference. One of:\n            \"economy\", \"premium economy\", \"business\", \"first\".\n        mode: Leave as \"browse\" (default). \"book\" is a restricted alpha — only use it if\n            the user explicitly asks to book a flight.\n        page: 1-based results page, 10 options per page. Increment to see more options.\n        airlines: Optional airline codes or names for browse mode (e.g. [\"UA\"] or\n            [\"United\"]). Passed to the Google Flights search API.\n        max_stops: Optional maximum stops per direction in browse mode. Use 0 for\n            nonstop only, 1 for nonstop or one-stop itineraries.\n\n    Returns:\n        A ranked, paged list of flight options — airlines, routes, prices, and a link.\n    ",
     "inputSchema": {
       "properties": {
         "origin": {
@@ -1099,128 +995,6 @@
       "title": "Get rental car details",
       "readOnlyHint": true,
       "destructiveHint": false,
-      "openWorldHint": true
-    }
-  },
-  {
-    "name": "book_vehicle",
-    "description": "Book a rental vehicle from a search result.\n\n    Requires a Gondola account (API key) and a saved payment method.\n    Use get_payment_methods to find your payment ID.\n\n    Args:\n        search_id: Search ID from search_vehicles.\n        vendor_code: Vendor code from search results (e.g. \"ZE\" for Hertz).\n        rate_code: Rate code of the selected vehicle from search results.\n        acriss_code: ACRISS vehicle classification code from search results.\n        given_name: Renter's first name.\n        family_name: Renter's last name.\n        email_address: Renter's email for confirmation.\n        phone_number: Renter's phone number with country code (e.g. \"+1-555-123-4567\").\n        payment_id: Payment method ID from get_payment_methods.\n        pickup_location: Optional pickup IATA code for the selected vehicle (disambiguates metro fanouts).\n        loyalty_account_id: Optional loyalty account ID to earn points on this rental.\n\n    Returns:\n        Booking confirmation with ID and details, or an error message.\n    ",
-    "inputSchema": {
-      "properties": {
-        "search_id": {
-          "title": "Search Id",
-          "type": "string"
-        },
-        "vendor_code": {
-          "title": "Vendor Code",
-          "type": "string"
-        },
-        "rate_code": {
-          "title": "Rate Code",
-          "type": "string"
-        },
-        "acriss_code": {
-          "title": "Acriss Code",
-          "type": "string"
-        },
-        "given_name": {
-          "title": "Given Name",
-          "type": "string"
-        },
-        "family_name": {
-          "title": "Family Name",
-          "type": "string"
-        },
-        "email_address": {
-          "title": "Email Address",
-          "type": "string"
-        },
-        "phone_number": {
-          "title": "Phone Number",
-          "type": "string"
-        },
-        "payment_id": {
-          "title": "Payment Id",
-          "type": "string"
-        },
-        "pickup_location": {
-          "default": "",
-          "title": "Pickup Location",
-          "type": "string"
-        },
-        "loyalty_account_id": {
-          "default": "",
-          "title": "Loyalty Account Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "search_id",
-        "vendor_code",
-        "rate_code",
-        "acriss_code",
-        "given_name",
-        "family_name",
-        "email_address",
-        "phone_number",
-        "payment_id"
-      ],
-      "title": "book_vehicleArguments",
-      "type": "object"
-    },
-    "outputSchema": {
-      "properties": {
-        "result": {
-          "title": "Result",
-          "type": "string"
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "title": "book_vehicleOutput",
-      "type": "object"
-    },
-    "annotations": {
-      "title": "Book a rental car",
-      "readOnlyHint": false,
-      "destructiveHint": true,
-      "openWorldHint": true
-    }
-  },
-  {
-    "name": "cancel_vehicle_booking",
-    "description": "Cancel an existing vehicle booking.\n\n    Args:\n        booking_id: The Gondola booking ID (confirmation number) of the vehicle booking.\n\n    Returns:\n        Cancellation result.\n    ",
-    "inputSchema": {
-      "properties": {
-        "booking_id": {
-          "title": "Booking Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "booking_id"
-      ],
-      "title": "cancel_vehicle_bookingArguments",
-      "type": "object"
-    },
-    "outputSchema": {
-      "properties": {
-        "result": {
-          "title": "Result",
-          "type": "string"
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "title": "cancel_vehicle_bookingOutput",
-      "type": "object"
-    },
-    "annotations": {
-      "title": "Cancel a rental car booking",
-      "readOnlyHint": false,
-      "destructiveHint": true,
       "openWorldHint": true
     }
   },
@@ -1561,7 +1335,7 @@
   },
   {
     "name": "get_travel_profiles",
-    "description": "Get the user's saved travel profiles (guest name, email, and phone presets).\n\n    Each profile has a selectable Profile ID. Pass it to book_hotel as `travel_profile_id`\n    to prefill the guest details \u2014 the same \"book as <traveler>\" selection the website\n    checkout offers \u2014 instead of collecting name, email, and phone field by field.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of travel profiles with IDs, or instructions to add one.\n    ",
+    "description": "Get the user's saved travel profiles (guest name, email, and phone presets).\n\n    Each profile has a selectable Profile ID. Pass it to book_hotel as `travel_profile_id`\n    to prefill the guest details — the same \"book as <traveler>\" selection the website\n    checkout offers — instead of collecting name, email, and phone field by field.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted list of travel profiles with IDs, or instructions to add one.\n    ",
     "inputSchema": {
       "properties": {},
       "title": "get_travel_profilesArguments",
@@ -1589,7 +1363,7 @@
   },
   {
     "name": "get_traveler_context",
-    "description": "Get the user's saved travel context to personalize recommendations.\n\n    Returns the user's loyalty programs and elite tiers, home airport, preferred airlines and\n    cabin, preferred hotel chains, typical trip patterns (business vs leisure, budgets, frequent\n    destinations), and any preferences they've stated or that have been learned from past\n    conversations. Call this once at the start of a travel or planning session and weigh it across\n    hotel, flight, and car recommendations \u2014 it is the single best source of who this traveler is.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted travel context, or instructions to build one.\n    ",
+    "description": "Get the user's saved travel context to personalize recommendations.\n\n    Returns the user's loyalty programs and elite tiers, home airport, preferred airlines and\n    cabin, preferred hotel chains, typical trip patterns (business vs leisure, budgets, frequent\n    destinations), and any preferences they've stated or that have been learned from past\n    conversations. Call this once at the start of a travel or planning session and weigh it across\n    hotel, flight, and car recommendations — it is the single best source of who this traveler is.\n\n    Requires a Gondola account (API key).\n\n    Returns:\n        Formatted travel context, or instructions to build one.\n    ",
     "inputSchema": {
       "properties": {},
       "title": "get_traveler_contextArguments",
@@ -1617,7 +1391,7 @@
   },
   {
     "name": "update_traveler_profile",
-    "description": "Save a learned travel preference or experience to the user's traveler profile.\n\n    Use when the user shares a durable preference, like, dislike, or trip experience that should\n    inform future recommendations \u2014 \"Always takes a window seat\", \"Prefers boutique hotels over\n    chains\", \"Vegetarian\". Don't save temporary logistics like \"my flight lands at 3pm\".\n\n    Saved entries come back from get_traveler_context in later sessions, which is how a preference\n    stated once is still known next time.\n\n    Requires a Gondola account (API key).\n\n    Args:\n        profile_entry: The preference or experience to save. Be specific and actionable.\n            Good: \"Prefers ocean-view rooms\". Bad: \"Liked the hotel\".\n\n    Returns:\n        Confirmation of the saved entry, or an error message.\n    ",
+    "description": "Save a learned travel preference or experience to the user's traveler profile.\n\n    Use when the user shares a durable preference, like, dislike, or trip experience that should\n    inform future recommendations — \"Always takes a window seat\", \"Prefers boutique hotels over\n    chains\", \"Vegetarian\". Don't save temporary logistics like \"my flight lands at 3pm\".\n\n    Saved entries come back from get_traveler_context in later sessions, which is how a preference\n    stated once is still known next time.\n\n    Requires a Gondola account (API key).\n\n    Args:\n        profile_entry: The preference or experience to save. Be specific and actionable.\n            Good: \"Prefers ocean-view rooms\". Bad: \"Liked the hotel\".\n\n    Returns:\n        Confirmation of the saved entry, or an error message.\n    ",
     "inputSchema": {
       "properties": {
         "profile_entry": {
