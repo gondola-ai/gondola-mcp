@@ -1,0 +1,11 @@
+{
+  "name": "gondola",
+  "version": "0.1.0",
+  "description": "Cash-vs-award travel search: hotels, flights, and rental cars across every major loyalty program, with cents-per-point valuations, loyalty tracking, rate alerts, and direct booking.",
+  "mcpServers": {
+    "gondola": {
+      "httpUrl": "https://mcp.gondola.ai/mcp"
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}
