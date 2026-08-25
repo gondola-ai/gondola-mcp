@@ -17,7 +17,7 @@ any MCP-compatible client.** Learn more at [gondola.ai/mcp](https://gondola.ai/m
 - **Auth:** search & discovery work **anonymously — no account, no API key**. Personal tools
   (loyalty balances, trips, saved profiles) use standard MCP **OAuth 2.1 with Dynamic
   Client Registration** — your client signs you in on first use, no key to copy.
-- **Tools:** 30 across hotels, flights, rental cars, loyalty, and analytics.
+- **Tools:** 31 across hotels, flights, rental cars, events, loyalty, and analytics.
 
 ---
 
@@ -87,7 +87,11 @@ Or `.vscode/mcp.json` (note: top-level key is `servers`):
 }
 ```
 
-**Gemini CLI** — `~/.gemini/settings.json` (note: `httpUrl`, not `url`):
+**Gemini CLI** — install as an extension (bundles the server plus usage context):
+```bash
+gemini extensions install https://github.com/gondola-ai/gondola-mcp
+```
+Or wire it up by hand in `~/.gemini/settings.json` (note: `httpUrl`, not `url`):
 ```json
 {
   "mcpServers": {
@@ -146,7 +150,7 @@ traveler profiles, and rate alerts.
 
 ---
 
-## MCP tools (30)
+## MCP tools (31)
 
 Search & discovery tools are anonymous. Tools marked **🔒** use your account and require the
 one-time OAuth sign-in.
@@ -173,7 +177,12 @@ a tool call are **not** part of the self-serve surface — see
 ### Flights
 | Tool | What it does |
 |------|--------------|
-| `search_flights` | Award and cash flight search with booking links. |
+| `search_flights` | Cash-priced flight search with booking links. |
+
+### Events
+| Tool | What it does |
+|------|--------------|
+| `search_events` | Live events with venue, date, and listed-price detail. |
 
 ### Rental cars
 | Tool | What it does |
