@@ -1,6 +1,7 @@
 # Gondola — Travel MCP Server & Claude Code Plugin
 
 [![gondola-mcp MCP server](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp/badges/score.svg)](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp)
+[![MCP Queen operational grade](https://mcpqueen.com/badge/ai.gondola/gondola.svg)](https://mcpqueen.com/s/ai.gondola/gondola)
 
 **The travel MCP that shows cash and award rates side by side.** Search hotels, flights, and rental
 cars across **every major hotel chain and loyalty program** — with cents-per-point valuations,
