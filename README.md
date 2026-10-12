@@ -250,13 +250,13 @@ Interested in partner access? Email [support@gondola.ai](mailto:support@gondola.
 
 ---
 
-## Saved preferences
+## Your traveler profile
 
-`update_traveler_profile` lets your assistant save a travel preference you share (a seat
-preference, a brand you avoid) to your Gondola traveler profile, and `get_traveler_context` reads
-it back in later sessions. The assistant tells you when it saves one. Review, edit, or clear saved
-preferences at any time in the Traveler Profile panel at
-[gondola.ai/concierge](https://www.gondola.ai/concierge). Details:
+`get_traveler_context` reads the traveler profile saved on your Gondola account: loyalty tiers,
+home airport, preferred airlines and chains, trip patterns, and the travel preferences stored
+there. Preferences are saved by Gondola Concierge or written by hand; connected assistants read
+the profile but do not write to it. Review, edit, or clear saved preferences at any time in the
+Traveler Profile panel at [gondola.ai/concierge](https://www.gondola.ai/concierge). Details:
 [Data privacy](https://www.gondola.ai/help/data-privacy).
 
 ## Why Gondola
