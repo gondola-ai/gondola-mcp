@@ -3,27 +3,33 @@
 [![gondola-mcp MCP server](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp/badges/score.svg)](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp)
 
 **The travel MCP that shows cash and award rates side by side.** Search hotels, flights, and rental
-cars across **every major hotel chain and loyalty program** — with cents-per-point valuations,
-loyalty balance tracking, rate alerts, and direct booking — right from your AI client.
+cars across **every major hotel chain and loyalty program**, with cents-per-point valuations, price
+prediction, your own loyalty balances and free-night certificates, rate alerts, and a checkout link
+for the rate you pick, right from your AI client.
 
 Built for **points and miles**: unlike award-flight-only tools, Gondola covers hotels, flights,
 *and* cars, and puts the cash price and the award (points) price in one view so you can see exactly
 when a redemption beats cash.
 
-**Works with Claude Code, Codex, Cursor, Windsurf, VS Code, Claude Desktop, ChatGPT, Gemini CLI, and
-any MCP-compatible client.** Learn more at [gondola.ai/mcp](https://gondola.ai/mcp).
+**Works with Claude, Claude Code, Codex, Cursor, Windsurf, VS Code, ChatGPT, Gemini CLI, and any
+MCP-compatible client.** Learn more at [gondola.ai/mcp](https://gondola.ai/mcp).
 
-- **Endpoint:** `https://mcp.gondola.ai/mcp` (Streamable HTTP)
-- **Auth:** search & discovery work **anonymously — no account, no API key**. Personal tools
-  (loyalty balances, trips, saved profiles) use standard MCP **OAuth 2.1 with Dynamic
-  Client Registration** — your client signs you in on first use, no key to copy.
-- **Tools:** 31 across hotels, flights, rental cars, events, loyalty, and analytics.
+- **Endpoint:** `https://mcp.gondola.ai/mcp/auth` (Streamable HTTP)
+- **Auth:** every tool uses your Gondola account. Your client signs you in with standard MCP
+  **OAuth 2.1 and Dynamic Client Registration** when you connect. A Gondola account is free, and
+  there is no API key to copy.
+- **Tools:** 36 across hotels, flights, rental cars, events, loyalty, and analytics.
 
 ---
 
 ## Quick Install
 
-### Claude Code plugin (recommended)
+### Claude (directory)
+
+In Claude, open **Settings > Connectors**, find **Gondola**, and choose **Connect**. Sign in to
+Gondola when prompted. Guide: [Using Gondola in Claude](https://www.gondola.ai/help/using-gondola-with-claude).
+
+### Claude Code plugin
 
 Inside Claude Code:
 
@@ -33,34 +39,34 @@ Inside Claude Code:
 ```
 
 This adds the Gondola MCP server plus slash commands (`/hotel-points`, `/award-flights`,
-`/worth-it`, `/optimize-points`). On first use of a personal tool, your client opens gondola.ai to
-sign you in via OAuth — takes a few seconds, no API key.
+`/worth-it`, `/optimize-points`). Your client opens gondola.ai to sign you in via OAuth the first
+time it connects.
 
 ### Or add the MCP server directly (any client)
 
-Search tools work anonymously; personal tools trigger an OAuth login on first call. No client
-needs an `mcp-remote` bridge — every client below supports remote Streamable HTTP natively.
+Every client below supports remote Streamable HTTP natively, so no `mcp-remote` bridge is needed.
+Each one prompts for the Gondola sign-in when it connects.
 
 **Claude Code**
 ```bash
-claude mcp add --transport http gondola https://mcp.gondola.ai/mcp
+claude mcp add --transport http gondola https://mcp.gondola.ai/mcp/auth
 ```
 
 **Codex CLI**
 ```bash
-codex mcp add gondola --url https://mcp.gondola.ai/mcp
+codex mcp add gondola --url https://mcp.gondola.ai/mcp/auth
 ```
 Or in `~/.codex/config.toml`:
 ```toml
 [mcp_servers.gondola]
-url = "https://mcp.gondola.ai/mcp"
+url = "https://mcp.gondola.ai/mcp/auth"
 ```
 
 **Cursor** — `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project):
 ```json
 {
   "mcpServers": {
-    "gondola": { "url": "https://mcp.gondola.ai/mcp" }
+    "gondola": { "url": "https://mcp.gondola.ai/mcp/auth" }
   }
 }
 ```
@@ -69,20 +75,20 @@ url = "https://mcp.gondola.ai/mcp"
 ```json
 {
   "mcpServers": {
-    "gondola": { "serverUrl": "https://mcp.gondola.ai/mcp" }
+    "gondola": { "serverUrl": "https://mcp.gondola.ai/mcp/auth" }
   }
 }
 ```
 
 **VS Code (Copilot / Agent mode)**
 ```bash
-code --add-mcp '{"name":"gondola","type":"http","url":"https://mcp.gondola.ai/mcp"}'
+code --add-mcp '{"name":"gondola","type":"http","url":"https://mcp.gondola.ai/mcp/auth"}'
 ```
 Or `.vscode/mcp.json` (note: top-level key is `servers`):
 ```json
 {
   "servers": {
-    "gondola": { "type": "http", "url": "https://mcp.gondola.ai/mcp" }
+    "gondola": { "type": "http", "url": "https://mcp.gondola.ai/mcp/auth" }
   }
 }
 ```
@@ -95,17 +101,17 @@ Or wire it up by hand in `~/.gemini/settings.json` (note: `httpUrl`, not `url`):
 ```json
 {
   "mcpServers": {
-    "gondola": { "httpUrl": "https://mcp.gondola.ai/mcp" }
+    "gondola": { "httpUrl": "https://mcp.gondola.ai/mcp/auth" }
   }
 }
 ```
 
-**Claude Desktop** — Settings → Connectors → **Add custom connector** → name `gondola`, URL
-`https://mcp.gondola.ai/mcp`. Leave the OAuth client fields and headers blank (DCR handles it).
+**Claude Desktop (custom connector)** — Settings → Connectors → **Add custom connector** → name
+`gondola`, URL `https://mcp.gondola.ai/mcp/auth`. Leave the OAuth client fields and headers blank
+(DCR handles it).
 
 **ChatGPT** — Settings → Connectors → Advanced → **Developer mode**, then **Add custom connector** →
-URL `https://mcp.gondola.ai/mcp`, auth = OAuth. (Anonymous search works pre-login; personal tools
-require the OAuth sign-in.)
+URL `https://mcp.gondola.ai/mcp/auth`, auth = OAuth.
 
 ---
 
@@ -116,20 +122,20 @@ Ask naturally, or use the slash commands the plugin installs.
 ### Compare cash vs. points for hotels
 
 ```
-"Find hotels in Tokyo for March 3–7 and show cash vs points with cents-per-point"
+"Compare cash vs points rates for Hyatt hotels in Tokyo, April 15 to 20"
 "Is it worth using Bonvoy points for the Ritz in Maui that week, or pay cash?"
 "Cheapest 5-night Hyatt stay in Lisbon on points in May"
 ```
 ```
-/hotel-points Tokyo 2026-03-03 2026-03-07
+/hotel-points Tokyo 2026-04-15 2026-04-20
 /worth-it Ritz-Carlton Maui, 4 nights in March, Bonvoy
 ```
 
 ### Search award + cash flights together
 
 ```
-"Business class SFO to Tokyo in November — award and cash side by side"
-"Cheapest way to fly JFK→LHR in points under 60k?"
+"Business class SFO to Tokyo in November, award and cash side by side"
+"Cheapest way to fly JFK to LHR in points under 60k?"
 ```
 ```
 /award-flights SFO HND 2026-11-10 business
@@ -138,113 +144,135 @@ Ask naturally, or use the slash commands the plugin installs.
 ### Make your points work harder
 
 ```
-"Where are my points worth the most right now?"
-"I have 180k Amex points and 90k Bonvoy — best redemption for a beach trip in March?"
+"Which of my loyalty points expire in the next three months?"
+"I have 180k Amex points and 90k Bonvoy. Best redemption for a beach trip in March?"
 ```
 ```
 /optimize-points a beach trip in March
 ```
 
-Signed-in users also get loyalty balances, upcoming/past trips, free-night certificates, saved
-traveler profiles, and rate alerts.
+### Watch a price
+
+```
+"Is the Park Hyatt Sydney likely to get cheaper for May 2 to 5, or should I book now?"
+"Set a rate alert for the Andaz Maui, December 20 to 27"
+```
 
 ---
 
-## MCP tools (31)
+## MCP tools (36)
 
-Search & discovery tools are anonymous. Tools marked **🔒** use your account and require the
-one-time OAuth sign-in.
+Every tool runs against your Gondola account after the one-time OAuth sign-in.
 
-Booking is handled through Gondola's checkout: `get_booking_link` and
-`get_vehicle_booking_link` hand your client a direct link. Tools that charge a saved card from
-a tool call are **not** part of the self-serve surface — see
-[Partner booking tools](#partner-booking-tools) below.
+Booking is handled through Gondola's checkout: `get_booking_link` and `get_vehicle_booking_link`
+hand your client a link to the exact rate, and you finish the reservation on the web. Flight search
+is discovery-only; flights cannot be booked through Gondola yet.
 
-### Hotels
+### Search
+
 | Tool | What it does |
 |------|--------------|
-| `search_hotels` | Find hotels with cash and award (points) rates. |
-| `compare_rates` | Cash vs points side by side, with cents-per-point value. |
-| `get_hotel_details` | Full detail for one property. |
-| `get_multi_night_rates` | Per-night rate breakdown across a stay. |
-| `get_similar_hotels` | Comparable properties to one you like. |
-| `get_hotel_stats` | Rate/availability stats for a hotel. |
-| `get_hotel_reviews` | Guest reviews. |
-| `predict_price` | Price prediction for a stay. |
-| `get_suggested_searches` | Suggested searches / inspiration. |
-| `get_booking_link` | Direct booking link. |
+| `search_hotels` | Find hotels by location and dates, with cash and points rates and deal scores. |
+| `get_hotel_details` | Stored property facts for one hotel: address, brand, ratings, amenities, room types, policies, and fees. |
+| `get_similar_hotels` | Find hotels similar to a given hotel. |
+| `search_flights` | Search for flights by route and date. |
+| `search_events` | Search for live events by artist, team, show, or event name. |
+| `search_vehicles` | Search for rental vehicles at an airport or city. |
+| `get_vehicle_details` | Get detailed information about a specific rental vehicle option. |
+| `get_hotel_reviews` | Get guest reviews for a specific hotel. |
+| `get_suggested_searches` | Get personalized travel suggestions and trip inspiration for the current user. |
 
-### Flights
+### Rates and value
+
 | Tool | What it does |
 |------|--------------|
-| `search_flights` | Cash-priced flight search with booking links. |
+| `get_hotel_rates` | Live room rates for one hotel and stay window, cash and points side by side. |
+| `compare_rates` | Compare current canonical cash vs points rates side-by-side for one or more hotels. |
+| `predict_price` | Predict whether the current rate at a hotel is a good deal based on historical price trends. |
+| `get_hotel_stats` | Get pricing percentile context for a specific hotel. |
+| `get_multi_night_rates` | Get cached, partial rate observations for a hotel over a flexible date range. |
+| `diagnose_rates` | Diagnose rate availability and per-supplier statuses for a specific hotel. |
+| `get_flight_points` | Award (miles) pricing for a flight search that reported pending award sources. |
 
-### Events
+### Checkout and bookings
+
 | Tool | What it does |
 |------|--------------|
-| `search_events` | Live events with venue, date, and listed-price detail. |
+| `get_booking_link` | Checkout link for a hotel rate, with dates and guests pre-filled. |
+| `prepare_flight_booking` | Re-shop an eligible flight selection and report how it can be booked. |
+| `get_flight_booking` | Current state of a Gondola flight booking: payment, ticketing, cancellation, and refund status. |
+| `get_vehicle_booking` | Get details for a specific vehicle booking by its Gondola booking ID. |
+| `get_vehicle_booking_link` | Get a Gondola.ai checkout link for a specific vehicle from search results. |
+| `get_vehicle_booking_coverage` | Get the rental car CDW/LDW coverage that was stored at booking time for a specific vehicle booking. |
+| `get_booking` | Get details for a hotel booking made through Gondola, using the Gondola booking ID shown as "Gondola booking" by get_upcoming_trips and get_past_trips. |
 
-### Rental cars
+### Rate alerts
+
 | Tool | What it does |
 |------|--------------|
-| `search_vehicles` | Search rental cars. |
-| `get_vehicle_details` | Detail for one vehicle/offer. |
-| `credit_card_coverage` | Check credit-card rental insurance coverage. |
-| `get_vehicle_booking_coverage` | Coverage on a specific booking. |
-| `get_vehicle_booking_link` | Direct booking link. |
-| `get_vehicle_booking` 🔒 | Retrieve a car booking. |
+| `get_rate_alerts` | Get all active rate alerts for the current user. |
+| `create_rate_alert` | Create a rate alert to monitor a hotel for price drops. |
+| `delete_rate_alert` | Delete a rate alert to stop monitoring a hotel for price drops. |
 
-### Loyalty & analytics
+### Trips, loyalty, and profile
+
 | Tool | What it does |
 |------|--------------|
-| `get_loyalty_accounts` 🔒 | Your loyalty point balances. |
-| `optimize_loyalty_portfolio` 🔒 | Where your points are worth the most. |
-| `get_free_night_credits` 🔒 | Free-night certificates you hold. |
-| `diagnose_rates` | Explain why a rate is what it is. |
-
-### Trips, alerts & profile
-| Tool | What it does |
-|------|--------------|
-| `get_upcoming_trips` 🔒 | Your upcoming trips. |
-| `get_past_trips` 🔒 | Your past trips. |
-| `get_booking` 🔒 | Retrieve a specific booking. |
-| `get_rate_alerts` 🔒 | Your rate alerts. |
-| `create_rate_alert` 🔒 | Create a rate alert. |
-| `delete_rate_alert` 🔒 | Delete a rate alert. |
-| `get_travel_profiles` 🔒 | Saved traveler profiles. |
-| `update_traveler_profile` 🔒 | Update a traveler profile. |
-| `get_traveler_context` 🔒 | Your traveler context/preferences. |
+| `get_upcoming_trips` | Get the user's upcoming hotel, flight, and rental car reservations. |
+| `get_past_trips` | Get the user's past hotel stays and flights. |
+| `get_loyalty_accounts` | Get the user's loyalty program memberships and current point balances. |
+| `get_flight_credits` | Get the user's active airline flight credits, eCredits, travel funds, vouchers, and travel-bank balances. |
+| `get_free_night_credits` | Free-night certificates you hold, such as Marriott Free Night Awards or Hyatt free nights. |
+| `get_suite_upgrade_credits` | Get the user's active suite upgrade awards and certificates across loyalty programs. |
+| `optimize_loyalty_portfolio` | Points expiring soon, best transfer opportunities from card currencies, and largest balances. |
+| `credit_card_coverage` | Look up rental car CDW/LDW (collision damage waiver / loss damage waiver) coverage provided by a credit card. |
+| `get_traveler_context` | Your saved travel context: loyalty tiers, home airport, preferred airlines and chains, trip patterns, and saved preferences. |
+| `get_favorite_hotels` | Get the hotels the user has saved as favorites in Gondola, newest first. |
 
 ### Partner booking tools
 
-Four tools place charges against a saved payment method or enumerate the cards that can be
-charged. They require the `mcp:book` scope, which is granted only to onboarded booking
-partners — a client that registers dynamically has it narrowed away at consent, so these tools
-are neither listed nor callable on a normal connection.
+A small set of tools places charges against a saved payment method or lists the cards that can be
+charged. They require the `mcp:book` scope, which is granted only to onboarded booking partners.
+A client that registers dynamically does not receive the scope, so these tools are neither listed
+nor callable on a normal connection.
 
 | Tool | What it does |
 |------|--------------|
-| `book_hotel` | Book a hotel room against a saved payment method. |
-| `book_vehicle` | Book a rental car against a saved payment method. |
-| `cancel_vehicle_booking` | Cancel a car booking. |
-| `get_payment_methods` | List saved payment methods available for booking. |
+| `book_hotel` | Book a hotel room using a rate from get_hotel_rates. |
+| `get_payment_methods` | List the user's saved payment methods for booking. |
+| `book_flight` | Book a prepared flight after the traveler confirms the exact quote. |
+| `cancel_flight_booking` | Preview, then confirm, cancellation of a Gondola flight booking. |
+| `book_vehicle` | Book a rental vehicle from a search result. |
+| `cancel_vehicle_booking` | Cancel an existing vehicle booking by its Gondola booking ID. |
+| `get_travel_profiles` | Saved travel profiles: guest name, email, and phone presets. |
 
 Interested in partner access? Email [support@gondola.ai](mailto:support@gondola.ai).
 
 ---
 
+## Your traveler profile
+
+`get_traveler_context` reads the traveler profile saved on your Gondola account: loyalty tiers,
+home airport, preferred airlines and chains, trip patterns, and the travel preferences stored
+there. Preferences are saved by Gondola Concierge or written by hand; connected assistants read
+the profile but do not write to it. Review, edit, or clear saved preferences at any time in the
+Traveler Profile panel at [gondola.ai/concierge](https://www.gondola.ai/concierge). Details:
+[Data privacy](https://www.gondola.ai/help/data-privacy).
+
 ## Why Gondola
 
 - **Cash and award, together.** Every search shows the cash price beside the points price with a
-  cents-per-point value — the "is this redemption worth it?" question, answered inline.
+  cents-per-point value, so the "is this redemption worth it?" question is answered inline.
 - **Every major chain + program**, not a single airline or a single OTA.
-- **Straight to checkout.** Hotels and cars hand off a direct booking link, so you finish on
+- **Straight to checkout.** Hotels and cars hand off a link to the exact rate, so you finish on
   Gondola rather than retyping the search somewhere else.
-- **No API key.** Anonymous search out of the box; OAuth only when you reach for your own data.
+- **No API key.** Standard OAuth sign-in through your client, nothing to copy or rotate.
 
 ## Links
 
 - Docs & tool reference: https://gondola.ai/mcp
+- Using Gondola in Claude: https://www.gondola.ai/help/using-gondola-with-claude
+- Building your own client: https://www.gondola.ai/help/mcp-oauth-integration
 - Website: https://www.gondola.ai
 - Server id (Official MCP Registry): `ai.gondola/gondola`
 - Also listed on [PulseMCP](https://www.pulsemcp.com/servers/gondola) and
