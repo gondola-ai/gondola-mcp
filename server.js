@@ -2,7 +2,7 @@
 /**
  * Gondola MCP — local catalog server.
  *
- * Gondola is a HOSTED MCP server (https://mcp.gondola.ai/mcp). This lightweight
+ * Gondola is a HOSTED MCP server (https://mcp.gondola.ai/mcp/auth). This lightweight
  * stdio server exists so registries and tools that build/introspect a server
  * locally can discover Gondola's tool catalog. It advertises the self-serve
  * tools (definitions pulled verbatim from the hosted server) via `tools/list`;
@@ -16,7 +16,7 @@
  * advertising them here would put the financial surface back in front of exactly
  * the registry crawlers that filtering exists to satisfy.
  *
- * To USE Gondola, connect your client directly to https://mcp.gondola.ai/mcp
+ * To USE Gondola, connect your client directly to https://mcp.gondola.ai/mcp/auth
  * (see the README / gondola.ai/mcp). You do not need to run this.
  */
 import { readFileSync } from "node:fs";
