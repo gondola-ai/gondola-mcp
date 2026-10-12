@@ -4,13 +4,14 @@
  *
  * Gondola is a HOSTED MCP server (https://mcp.gondola.ai/mcp). This lightweight
  * stdio server exists so registries and tools that build/introspect a server
- * locally can discover Gondola's tool catalog. It advertises the 30 self-serve
+ * locally can discover Gondola's tool catalog. It advertises the self-serve
  * tools (definitions pulled verbatim from the hosted server) via `tools/list`;
  * actual execution runs on the hosted server, so `tools/call` returns a pointer
  * there.
  *
- * The four mcp:book tools (book_hotel, book_vehicle, cancel_vehicle_booking,
- * get_payment_methods) are deliberately absent. The hosted server filters them
+ * The partner-only mcp:book tools (book_hotel, book_vehicle, book_flight,
+ * cancel_vehicle_booking, cancel_flight_booking, get_payment_methods,
+ * get_travel_profiles) are deliberately absent. The hosted server filters them
  * out of `tools/list` for every connection without that partner-only scope, and
  * advertising them here would put the financial surface back in front of exactly
  * the registry crawlers that filtering exists to satisfy.
@@ -28,7 +29,7 @@ import {
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
-const HOSTED_URL = "https://mcp.gondola.ai/mcp";
+const HOSTED_URL = "https://mcp.gondola.ai/mcp/auth";
 const here = dirname(fileURLToPath(import.meta.url));
 const tools = JSON.parse(readFileSync(join(here, "tools.json"), "utf8"));
 
@@ -45,8 +46,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => ({
       type: "text",
       text:
         `Gondola runs as a hosted MCP server. Connect your client directly to ` +
-        `${HOSTED_URL} to execute "${request.params.name}" — search works ` +
-        `anonymously (no API key); account and booking tools use OAuth 2.1. ` +
+        `${HOSTED_URL} to execute "${request.params.name}". Every tool uses ` +
+        `your Gondola account via OAuth 2.1; your client signs you in on connect. ` +
         `Setup for every client is at https://gondola.ai/mcp.`,
     },
   ],
