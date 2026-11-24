@@ -34,7 +34,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const tools = JSON.parse(readFileSync(join(here, "tools.json"), "utf8"));
 
 const server = new Server(
-  { name: "gondola", version: "0.1.0" },
+  { name: "gondola", version: "0.1.7" },
   { capabilities: { tools: {} } }
 );
 

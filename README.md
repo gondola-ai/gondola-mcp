@@ -1,11 +1,12 @@
-# Gondola — Travel MCP Server & Claude Code Plugin
+# Gondola: Travel for AI Agents
 
 [![gondola-mcp MCP server](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp/badges/score.svg)](https://glama.ai/mcp/servers/gondola-ai/gondola-mcp)
 
-**The travel MCP that shows cash and award rates side by side.** Search hotels, flights, and rental
-cars across **every major hotel chain and loyalty program**, with cents-per-point valuations, price
-prediction, your own loyalty balances and free-night certificates, rate alerts, and a checkout link
-for the rate you pick, right from your AI client.
+**The travel infrastructure built for AI agents: search and book flights, hotels, and rental cars.**
+Gondola is a hosted MCP server that shows cash and award rates side by side across **every major
+hotel chain and loyalty program**, with cents-per-point valuations, price history, your own loyalty
+balances and free-night certificates, promotions, rate alerts, and a checkout link for the rate you
+pick, right from your AI client.
 
 Built for **points and miles**: unlike award-flight-only tools, Gondola covers hotels, flights,
 *and* cars, and puts the cash price and the award (points) price in one view so you can see exactly
@@ -18,7 +19,7 @@ MCP-compatible client.** Learn more at [gondola.ai/mcp](https://gondola.ai/mcp).
 - **Auth:** every tool uses your Gondola account. Your client signs you in with standard MCP
   **OAuth 2.1 and Dynamic Client Registration** when you connect. A Gondola account is free, and
   there is no API key to copy.
-- **Tools:** 36 across hotels, flights, rental cars, events, loyalty, and analytics.
+- **Tools:** 40 across hotels, flights, rental cars, events, loyalty, and analytics.
 
 ---
 
@@ -158,15 +159,24 @@ Ask naturally, or use the slash commands the plugin installs.
 "Set a rate alert for the Andaz Maui, December 20 to 27"
 ```
 
+### Catch up on your travel
+
+```
+"What changed on my trips this week?"
+"Do I have any hotel or airline promotions worth using for my Chicago trip?"
+```
+
 ---
 
-## MCP tools (36)
+## MCP tools (40)
 
 Every tool runs against your Gondola account after the one-time OAuth sign-in.
 
 Booking is handled through Gondola's checkout: `get_booking_link` and `get_vehicle_booking_link`
 hand your client a link to the exact rate, and you finish the reservation on the web. Flight search
-is discovery-only; flights cannot be booked through Gondola yet.
+shows cash prices, with award (miles) prices on request. Booking a flight through Gondola is in
+limited access: approved accounts can prepare a fare and pick seats, and everyone else gets
+discovery results to book with the airline.
 
 ### Search
 
@@ -180,7 +190,7 @@ is discovery-only; flights cannot be booked through Gondola yet.
 | `search_vehicles` | Search for rental vehicles at an airport or city. |
 | `get_vehicle_details` | Get detailed information about a specific rental vehicle option. |
 | `get_hotel_reviews` | Get guest reviews for a specific hotel. |
-| `get_suggested_searches` | Get personalized travel suggestions and trip inspiration for the current user. |
+| `get_suggested_searches` | Personalized trip ideas grounded in your preferences, recent searches, and upcoming holidays. |
 
 ### Rates and value
 
@@ -188,8 +198,8 @@ is discovery-only; flights cannot be booked through Gondola yet.
 |------|--------------|
 | `get_hotel_rates` | Live room rates for one hotel and stay window, cash and points side by side. |
 | `compare_rates` | Compare current canonical cash vs points rates side-by-side for one or more hotels. |
-| `predict_price` | Predict whether the current rate at a hotel is a good deal based on historical price trends. |
-| `get_hotel_stats` | Get pricing percentile context for a specific hotel. |
+| `predict_price` | Judge a hotel rate against its price history: book now or wait, with supporting signals. |
+| `get_hotel_stats` | Hotel price percentiles: where the current rate falls against the property's typical pricing. |
 | `get_multi_night_rates` | Get cached, partial rate observations for a hotel over a flexible date range. |
 | `diagnose_rates` | Diagnose rate availability and per-supplier statuses for a specific hotel. |
 | `get_flight_points` | Award (miles) pricing for a flight search that reported pending award sources. |
@@ -200,6 +210,8 @@ is discovery-only; flights cannot be booked through Gondola yet.
 |------|--------------|
 | `get_booking_link` | Checkout link for a hotel rate, with dates and guests pre-filled. |
 | `prepare_flight_booking` | Re-shop an eligible flight selection and report how it can be booked. |
+| `get_flight_seats` | Seat maps for a prepared flight quote, so a seat can be recommended from your preferences and history. |
+| `select_flight_seats` | Save seat choices on your Gondola checkout draft. It does not reserve a seat, book, or charge. |
 | `get_flight_booking` | Current state of a Gondola flight booking: payment, ticketing, cancellation, and refund status. |
 | `get_vehicle_booking` | Get details for a specific vehicle booking by its Gondola booking ID. |
 | `get_vehicle_booking_link` | Get a Gondola.ai checkout link for a specific vehicle from search results. |
@@ -212,7 +224,7 @@ is discovery-only; flights cannot be booked through Gondola yet.
 |------|--------------|
 | `get_rate_alerts` | Get all active rate alerts for the current user. |
 | `create_rate_alert` | Create a rate alert to monitor a hotel for price drops. |
-| `delete_rate_alert` | Delete a rate alert to stop monitoring a hotel for price drops. |
+| `delete_rate_alert` | Permanently delete a rate alert and stop its price-drop emails. |
 
 ### Trips, loyalty, and profile
 
@@ -220,6 +232,8 @@ is discovery-only; flights cannot be booked through Gondola yet.
 |------|--------------|
 | `get_upcoming_trips` | Get the user's upcoming hotel, flight, and rental car reservations. |
 | `get_past_trips` | Get the user's past hotel stays and flights. |
+| `get_travel_feed` | Recent travel activity: price drops, auto-save rebookings, new or updated bookings, balance changes, and expiring credits. |
+| `get_promotions` | Travel promotions available to you from connected inboxes, with terms, deadlines, and offer links. |
 | `get_loyalty_accounts` | Get the user's loyalty program memberships and current point balances. |
 | `get_flight_credits` | Get the user's active airline flight credits, eCredits, travel funds, vouchers, and travel-bank balances. |
 | `get_free_night_credits` | Free-night certificates you hold, such as Marriott Free Night Awards or Hyatt free nights. |
@@ -261,6 +275,8 @@ Traveler Profile panel at [gondola.ai/concierge](https://www.gondola.ai/concierg
 
 ## Why Gondola
 
+- **Built for agents.** Tool titles, input descriptions, and read-only or destructive hints are
+  written for a model to choose the right call, and results lead with the value signal.
 - **Cash and award, together.** Every search shows the cash price beside the points price with a
   cents-per-point value, so the "is this redemption worth it?" question is answered inline.
 - **Every major chain + program**, not a single airline or a single OTA.

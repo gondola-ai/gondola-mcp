@@ -1,7 +1,7 @@
 {
   "name": "gondola",
   "version": "0.1.0",
-  "description": "Cash-vs-award travel search: hotels, flights, and rental cars across every major loyalty program, with cents-per-point valuations, loyalty tracking, rate alerts, and direct booking.",
+  "description": "Travel infrastructure built for AI agents: search and book flights, hotels, and rental cars, with cash and award rates side by side, cents-per-point valuations, loyalty tracking, and rate alerts.",
   "mcpServers": {
     "gondola": {
       "httpUrl": "https://mcp.gondola.ai/mcp/auth"

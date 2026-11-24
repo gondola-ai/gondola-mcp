@@ -1,7 +1,7 @@
 {
   "name": "gondola",
   "version": "0.1.0",
-  "description": "The travel MCP that shows cash and award rates side by side. Search hotels, flights, and rental cars across every major loyalty program, with cents-per-point valuations, loyalty balance tracking, rate alerts, and direct booking. Points-and-miles first: covers hotels, flights, and cars, not just award flights.",
+  "description": "The travel infrastructure built for AI agents: search and book flights, hotels, and rental cars. Shows cash and award rates side by side across every major loyalty program, with cents-per-point valuations, loyalty balance tracking, promotions, and rate alerts.",
   "author": {
     "name": "Gondola AI",
     "email": "team@gondola.ai",
