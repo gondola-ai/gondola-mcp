@@ -5,13 +5,13 @@
     "email": "team@gondola.ai"
   },
   "metadata": {
-    "description": "Gondola travel MCP — cash-vs-award search for hotels, flights, and rental cars across every major loyalty program."
+    "description": "Gondola: travel for AI agents. Search and book flights, hotels, and rental cars, with cash and award rates side by side."
   },
   "plugins": [
     {
       "name": "gondola",
       "source": ".",
-      "description": "Cash-vs-award travel search: hotels, flights, and rental cars across every major loyalty program, with cents-per-point valuations, loyalty tracking, rate alerts, and direct booking."
+      "description": "Travel infrastructure built for AI agents: search and book flights, hotels, and rental cars, with cash and award rates side by side, cents-per-point valuations, loyalty tracking, and rate alerts."
     }
   ]
 }
